@@ -2,4 +2,6 @@ Hi, I'm Mark.
 
 No bio yet. Not sure why you're here either.
 
-That's it.
+![Stats](./profile/stats.svg)
+
+![Top Languages](./profile/top-langs.svg)
