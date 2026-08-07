@@ -19,8 +19,10 @@ def main() -> None:
     svg = re.sub(r'height="\d+"', 'height="195"', svg, count=1)
     svg = re.sub(r'viewBox="0 0 467 \d+"', 'viewBox="0 0 467 195"', svg, count=1)
 
-    # The folder/book icon, matching github-readme-stats dark theme styles
-    row = f"""</g><g transform="translate(0, 100)">
+    # The folder/book icon, matching github-readme-stats dark theme styles.
+    # NOTE: no leading </g> here - the regex below consumes the previous
+    # row's closing tags, so this row is a complete, self-contained group.
+    row = f"""<g transform="translate(0, 100)">
     <g class="stagger" style="animation-delay: 1050ms" transform="translate(25, 0)">
       
     <svg data-testid="icon" class="icon" viewBox="0 0 16 16" version="1.1" width="16" height="16">
@@ -37,8 +39,10 @@ def main() -> None:
     </g>
   </g>"""
 
-    # Append the new row immediately after the last stat row (the Issues row)
-    pattern = re.compile(r'(data-testid="issues"[^>]*>\s*[^<]*</text>\s*</g>)')
+    # Append the new row after the last stat row (the Issues row).
+    # Consume BOTH closing </g> tags (stagger group + translate group) so the
+    # injected row is a complete group and the SVG stays well-formed.
+    pattern = re.compile(r'(data-testid="issues"[^>]*>\s*[^<]*</text>\s*</g>\s*</g>)')
     svg, n = pattern.subn(lambda m: m.group(1) + row, svg, count=1)
     if n == 0:
         raise SystemExit("ERROR: could not find issues row to inject after")
