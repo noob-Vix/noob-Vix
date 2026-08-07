@@ -21,7 +21,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: stats
-          options: username=${{ github.repository_owner }}&show_icons=true&hide_border=true&commits_year=${{ env.YEAR }}
+          options: username=${{ github.repository_owner }}&show_icons=true&hide_border=true&theme=dark&hide=contribs&commits_year=${{ env.YEAR }}
           path: profile/stats.svg
           token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: "true"
@@ -30,7 +30,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&hide_border=true&exclude_repo=nft_marketplaceSUI,My_coin_template
+          options: username=${{ github.repository_owner }}&layout=compact&hide_border=true&theme=dark&exclude_repo=nft_marketplaceSUI,My_coin_template
           path: profile/top-langs.svg
           token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: "true"
