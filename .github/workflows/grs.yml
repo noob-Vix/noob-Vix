@@ -17,15 +17,6 @@ jobs:
       - name: Set current year
         run: echo "YEAR=$(date -u +%Y)" >> "$GITHUB_ENV"
 
-      - name: Update yearly contributions
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          FROM="$YEAR-01-01T00:00:00Z"
-          TO="$YEAR-12-31T23:59:59Z"
-          COUNT=$(gh api graphql -f query="query { user(login: \"${{ github.repository_owner }}\") { contributionsCollection(from: \"$FROM\", to: \"$TO\") { contributionCalendar { totalContributions } } } }" --jq '.data.user.contributionsCollection.contributionCalendar.totalContributions')
-          sed -i "s/🔥 \*\*[0-9]*\*\* contributions in [0-9]*/🔥 **${COUNT}** contributions in ${YEAR}/" README.md
-
       - name: Generate stats card
         uses: stats-organization/github-readme-stats-action@v2
         with:
@@ -44,10 +35,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: "true"
 
+      - name: Inject yearly contributions into stats card
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FROM="$YEAR-01-01T00:00:00Z"
+          TO="$YEAR-12-31T23:59:59Z"
+          COUNT=$(gh api graphql -f query="query { user(login: \"${{ github.repository_owner }}\") { contributionsCollection(from: \"$FROM\", to: \"$TO\") { contributionCalendar { totalContributions } } } }" --jq '.data.user.contributionsCollection.contributionCalendar.totalContributions')
+          python3 .github/scripts/inject_stats.py "$COUNT" "$YEAR" profile/stats.svg
+
       - name: Commit cards
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add profile/*.svg README.md
+          git add profile/*.svg
           git commit -m "Update README cards" || exit 0
           git push
