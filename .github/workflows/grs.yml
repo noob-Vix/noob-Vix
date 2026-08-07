@@ -14,11 +14,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set current year
+        run: echo "YEAR=$(date -u +%Y)" >> "$GITHUB_ENV"
+
       - name: Generate stats card
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: stats
-          options: username=${{ github.repository_owner }}&show_icons=true&hide_border=true
+          options: username=${{ github.repository_owner }}&show_icons=true&hide_border=true&commits_year=${{ env.YEAR }}
           path: profile/stats.svg
           token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: "true"
@@ -27,7 +30,7 @@ jobs:
         uses: stats-organization/github-readme-stats-action@v2
         with:
           card: top-langs
-          options: username=${{ github.repository_owner }}&layout=compact&hide_border=true
+          options: username=${{ github.repository_owner }}&layout=compact&hide_border=true&exclude_repo=nft_marketplaceSUI,My_coin_template
           path: profile/top-langs.svg
           token: ${{ secrets.GITHUB_TOKEN }}
           fail_on_error: "true"
