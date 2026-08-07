@@ -17,6 +17,15 @@ jobs:
       - name: Set current year
         run: echo "YEAR=$(date -u +%Y)" >> "$GITHUB_ENV"
 
+      - name: Update yearly contributions
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          FROM="$YEAR-01-01T00:00:00Z"
+          TO="$YEAR-12-31T23:59:59Z"
+          COUNT=$(gh api graphql -f query="query { user(login: \"${{ github.repository_owner }}\") { contributionsCollection(from: \"$FROM\", to: \"$TO\") { contributionCalendar { totalContributions } } } }" --jq '.data.user.contributionsCollection.contributionCalendar.totalContributions')
+          sed -i "s/🔥 \*\*[0-9]*\*\* contributions in [0-9]*/🔥 **${COUNT}** contributions in ${YEAR}/" README.md
+
       - name: Generate stats card
         uses: stats-organization/github-readme-stats-action@v2
         with:
@@ -39,6 +48,6 @@ jobs:
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@users.noreply.github.com"
-          git add profile/*.svg
+          git add profile/*.svg README.md
           git commit -m "Update README cards" || exit 0
           git push
